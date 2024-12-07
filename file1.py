@@ -28,8 +28,47 @@ class Widget(QMainWindow):
         self.ui.listWidget2.clear()
         self.ui.listWidget2.addItems(self.notes[note_name]['теги'])
         print(self.notes)
-
-
+    def show_note (self):
+        if self.ui.listWidget.selectItems():
+            key = self.ui.listWidget.selectedItems()[0].text()
+            if 'текст' in self.notes[key]:
+                self.ui.textEdit.setPlainText(self.notes[key]['текст'])
+            else:
+                self.ui.textEdit.clear()
+        self.ui.textlistWidget_2.clear()
+        self.ui.textlistWidget_2.addItems(self.notes[key]['теги'])
+        
+    def save_note(self):
+        if self.ui.listWidget.selectedItems():
+            key = self.ui.listWidget.selectedItems()[0].text()
+            self.notes[key][''] = self.ui.textEdit.toPlainText()
+            self.ui.listWidget_2.clear()
+            self.ui.listWidget_2.addItems(self.notes[key][''])
+            self.ui.listWidget.clear()
+            self.ui.listWidget.addItems(self.notes.keys())
+            with open ('notes_data.json', 'w', encoding= 'utf-8') as file:
+                json.dump(self.notes, file, sort_keys = True, ensure_ascii=False)
+        else:
+            print('Замітка для збереження не вибрана!')
+    def del_note(self):
+        if self.ui.listWidget.selectedItems():
+            key = self.ui.listWidget.selectedItems()[0].text()
+            del self.notes[key]
+            self.ui.listWidget_2.clear()
+            self.ui.textEdit.clear()
+            with open ('notes_data.json', 'w', encoding= 'utf-8') as file:
+                json.dump(self.notes, file, sort_keys = True, ensure_ascii=False)
+            self.ui.listWidget.clear()
+            self.ui.listWidget.addItems(self.notes.keys())
+        else:
+            print('Замітку для видалення не вибрано!')
+    def add_tag(self):
+        if self.ui.listWidget.selectedItems():
+            key = self.ui.listWidget.selectedItems()[0].text()
+            tag = self.ui.lineEdit.text()
+            if not tag in self.notes[key]['теги']:
+                self.notes[key]['теги'].append(tag)
+                
 
 
 app = QApplication([])
