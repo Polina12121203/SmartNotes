@@ -12,10 +12,9 @@ class Widget(QMainWindow):
         self.ui.pushButton_3.clicked.connect(self.add_note)
         self.ui.pushButton.clicked.connect(self.save_note)
         self.ui.pushButton_2.clicked.connect(self.del_note)
-        self.ui.pushButton_6.clicked.connect(self.add_tag)
+        self.ui.pushButton_4.clicked.connect(self.add_tag)
         self.ui.pushButton_5.clicked.connect(self.del_tag)
-        
-        
+        self.ui.pushButton_6.clicked.connect(self.search_by_tag)
         self.ui.listWidget.itemClicked.connect(self.show_note)
 
 
@@ -53,7 +52,7 @@ class Widget(QMainWindow):
     def save_note(self):
         if self.ui.listWidget.selectedItems():
             key = self.ui.listWidget.selectedItems()[0].text()
-            self.notes[key][''] = self.ui.textEdit.toPlainText()
+            self.notes[key]['текст'] = self.ui.textEdit.toPlainText()
             self.ui.listWidget_2.clear()
             self.ui.listWidget_2.addItems(self.notes[key]['теги'])
             self.ui.listWidget.clear()
@@ -89,7 +88,7 @@ class Widget(QMainWindow):
     def del_tag(self):
         if self.ui.listWidget_2.selectedItems():
             tag = self.ui.listWidget_2.selectedItems()[0].text()
-            key = self.ui.listWidget_2.selectedItems()[0].text()
+            key = self.ui.listWidget.selectedItems()[0].text()
             self.notes[key]['теги'].remove(tag)
             self.ui.listWidget_2.clear()
             self.ui.listWidget_2.addItems(self.notes[key]['теги'])
@@ -97,7 +96,15 @@ class Widget(QMainWindow):
                 json.dump(self.notes, file, sort_keys = True)
         else:
             print('Тег для видалення не вибрано!')
-
+    def search_by_tag(self):
+        tag_name, ok = QInputDialog.getText(self, 'Шукати тег', "Назва тегу:")
+        if ok and tag_name!="":
+            self.ui.listWidget.clear()
+            self.ui.textEdit.clear()
+            matching_notes = [note for note, data in self.notes.items() if tag_name in data['теги']]
+            self.ui.listWidget.addItems(matching_notes)
+        else:
+            print("Помилка під час пошуку")
 app = QApplication([])
 ex = Widget()
 ex.show()
