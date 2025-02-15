@@ -15,6 +15,10 @@ class Widget(QMainWindow):
         self.ui.pushButton.clicked.connect(self.load_folder)
         self.ui.listWidget.itemClicked.connect(self.select_image)
         self.ui.pushButton_7.clicked.connect(self.apply_bw)
+        self.ui.pushButton_6.clicked.connect(self.apply_blur)
+        self.ui.pushButton_2.clicked.connect(self.apply_left)
+        self.ui.pushButton_3.clicked.connect(self.apply_flip)
+        self.ui.pushButton_4.clicked.connect(self.apply_right)
         
     def load_folder(self):
         folder = QFileDialog.getExistingDirectory(self, "Оберіть папку")
@@ -32,12 +36,21 @@ class Widget(QMainWindow):
         self.ui.label.setPixmap(pixmap.scaled(self.ui.label.width(), self.ui.label.height()))
     def apply_bw(self):
         self.display_image(self.processor.do_bw())
+    def apply_blur(self):
+        self.display_image(self.processor.do_blur())
+    def apply_left(self):
+        self.display_image(self.processor.do_left())
+    def apply_right(self):
+        self.display_image(self.processor.do_right())
+    def apply_flip(self):
+        self.display_image(self.processor.do_flip())
+        
 class ImageProcessor:
     def __init__(self):
         self.image = None
         self.dir = None
         self.filename = None
-        self.save_dir = "Оброблені зображення"
+        self.save_dir = "picture"
     def image_load(self, dir, filename):
         self.dir = dir
         self.filename = filename
@@ -47,16 +60,28 @@ class ImageProcessor:
         path = os.path.join(self.dir, self.save_dir)
         if not os.path.exists(path):
             os.mkdir(path)
-            image_path = os.path.join(path, self.filename)
+        image_path = os.path.join(path, self.filename)
         self.image.save(image_path)
         return image_path
     def do_bw(self):
         if self.image:
             self.image = self.image.convert('L')
             return self.save_image()
-    def do_blure(self):
+    def do_blur(self):
         if self.image:
-            self.image = self.image.filter(ImageFilter.BLUR)
+            self.image = self.image.filter(SHARPEN)
+            return self.save_image()
+    def do_left(self):
+        if self.image:
+            self.image = self.image.transpose(Image.ROTATE_90)
+            return self.save_image()
+    def do_right(self):
+        if self.image:
+            self.image = self.image.transpose(Image.ROTATE_270)
+            return self.save_image()
+    def do_flip(self):
+        if self.image:
+            self.image = self.image.transpose(Image.FLIP_LEFT_RIGHT)
             return self.save_image()
     
 app = QApplication([])
